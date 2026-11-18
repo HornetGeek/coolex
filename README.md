@@ -8,9 +8,7 @@ Run `python3 -m http.server 8080` in this directory, then open `http://localhost
 
 ## Contact details
 
-The published design initially displays **example details** that cannot send messages. Set the verified email address and international WhatsApp number in `CONTACT_SETTINGS` at the top of `script.js` to activate the links. Keep the phone number as digits, including country code, with no plus sign.
-
-The product descriptions reflect the photographed package; confirm them against the final product before public launch.
+The homepage links to both COOLEX WhatsApp numbers. Each catalog card opens a static page under `products/` with Arabic and English descriptions, serving ideas, and product-specific WhatsApp inquiries.
 
 ## GitHub Pages
 

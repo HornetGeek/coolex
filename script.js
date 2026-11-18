@@ -1,5 +1,3 @@
-/* Replace these examples with verified details to activate contact links. */
-const CONTACT_SETTINGS = { email: '', whatsapp: '' };
 const english = {
   skip: 'Skip to content',
   announcement: 'Fresh from nature. Carefully frozen.',
@@ -41,7 +39,7 @@ const english = {
   contactKicker: "LET'S CONNECT", contactTitle: 'Have a question? Say hello.',
   contactDesc: 'Interested in COOLEX products, distribution opportunities, or business partnerships? We would love to hear from you.',
   contactPoint1: 'Product inquiries', contactPoint2: 'Distribution & partnerships', contactPoint3: 'General questions',
-  whatsapp: 'WhatsApp', contactEmail: 'Email', contactDemo: 'Contact details are examples. Official details will be added before messages are accepted.', contactCardTitle: 'Let’s start a conversation', contactCardSubtitle: 'Products, distribution and partnerships.', contactCardBody: 'Reach us by email or WhatsApp once our official contact details are available. We look forward to hearing from you.',
+  whatsapp: 'WhatsApp', backRange: 'Back to products', serving: 'In the kitchen', inquiry: 'Ask about this product',
   footerTag: 'Bringing nature closer to your kitchen.', rights: 'All rights reserved.'
 };
 
@@ -66,7 +64,8 @@ function applyLanguage(lang) {
   const values = lang === 'ar' ? originalArabic : english;
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     const key = element.dataset.i18n;
-    if (values[key] !== undefined) element.textContent = values[key];
+    const text = lang === "en" ? (element.dataset.en || values[key]) : values[key];
+    if (text !== undefined) element.textContent = text;
   });
   document.querySelectorAll('[data-placeholder-ar]').forEach((element) => {
     element.placeholder = element.getAttribute(`data-placeholder-${lang}`) || '';
@@ -82,10 +81,16 @@ function applyLanguage(lang) {
   document.querySelector('#menu-toggle').setAttribute('aria-label', lang === 'ar' ? 'فتح القائمة' : 'Open menu');
   document.querySelector('#site-nav').setAttribute('aria-label', lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation');
   document.title = lang === 'ar' ? 'COOLEX | كوليكس - خضروات وفاكهة مجمدة بجودة مميزة' : 'COOLEX | Premium Frozen Produce';
-  const emailAction = document.querySelector('.contact-option:first-child .contact-action');
-  const whatsappAction = document.querySelector('.contact-option:nth-child(2) .contact-action');
-  if (emailAction) emailAction.textContent = lang === 'ar' ? 'راسلنا' : 'Email us';
-  if (whatsappAction) whatsappAction.textContent = lang === 'ar' ? 'افتح واتساب' : 'Open WhatsApp';
+  const product = document.querySelector('.detail h1');
+  if (product) {
+    document.title = product.textContent + ' | COOLEX';
+    const message = lang === 'ar'
+      ? 'مرحبًا، أود الاستفسار عن منتج كوليكس: ' + product.textContent
+      : 'Hello, I would like to ask about COOLEX ' + product.textContent + '.';
+    document.querySelectorAll('[data-whatsapp]').forEach(link => {
+      link.href = 'https://wa.me/' + link.dataset.whatsapp + '?text=' + encodeURIComponent(message);
+    });
+  }
   saveLanguage(lang);
 }
 
@@ -118,31 +123,6 @@ function updateHeader() { header.classList.toggle('is-scrolled', window.scrollY 
 window.addEventListener('scroll', updateHeader, { passive: true });
 updateHeader();
 document.querySelector('#year').textContent = new Date().getFullYear();
-
-// Activate direct links only after verified contact details are supplied.
-const contactEmail = CONTACT_SETTINGS.email.trim();
-const contactWhatsapp = CONTACT_SETTINGS.whatsapp.replace(/\D/g, '');
-if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-  const emailDetail = document.querySelector('.contact-option:first-child');
-  emailDetail.querySelector('small').textContent = contactEmail;
-  const link = document.createElement('a');
-  link.className = 'contact-action';
-  link.href = `mailto:${contactEmail}`;
-  link.textContent = currentLanguage === 'ar' ? 'راسلنا' : 'Email us';
-  emailDetail.append(link);
-}
-if (contactWhatsapp.length >= 8 && contactWhatsapp.length <= 15) {
-  const whatsappDetail = document.querySelector('.contact-option:nth-child(2)');
-  whatsappDetail.querySelector('small').textContent = `+${contactWhatsapp}`;
-  const link = document.createElement('a');
-  link.className = 'contact-action';
-  link.href = `https://wa.me/${contactWhatsapp}`;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = currentLanguage === 'ar' ? 'افتح واتساب' : 'Open WhatsApp';
-  whatsappDetail.append(link);
-}
-if (document.querySelector('.contact-action')) document.querySelector('.contact-demo').hidden = true;
 
 // Progressive enhancement: sections are still shown if JavaScript is disabled.
 if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
